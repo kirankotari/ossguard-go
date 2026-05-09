@@ -1,6 +1,6 @@
-# Binary
-ossguard
-ossguard-*
+# Binary (root only)
+/ossguard
+/ossguard-*
 *.exe
 
 # IDE
