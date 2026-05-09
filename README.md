@@ -1,8 +1,13 @@
-# ossguard
+# OSSGuard — Go Implementation
 
-> One CLI to guard any OSS project with OpenSSF security best practices — bootstrap, scan, and monitor.
+**The native Go implementation of [OSSGuard](https://github.com/kirankotari/ossguard).**
 
-Native Go implementation — single static binary, zero runtime dependencies.
+[![Go](https://img.shields.io/github/v/release/kirankotari/ossguard-go)](https://github.com/kirankotari/ossguard-go/releases)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
+Single static binary, zero runtime dependencies. Optimized for CI pipelines and automation.
+
+> For full documentation, all install methods, and command examples, see the main [ossguard](https://github.com/kirankotari/ossguard) repo.
 
 ## Install
 
@@ -78,9 +83,18 @@ ossguard pin --apply
 
 All commands support `--json` for machine-readable output.
 
+## Other Implementations
+
+| Implementation | Install | Best for |
+|---------------|---------|----------|
+| **[ossguard-python](https://github.com/kirankotari/ossguard-python)** | `pip install ossguard` | Rich UI, developer workstation |
+| **[ossguard-npm](https://github.com/kirankotari/ossguard-npm)** | `npx ossguard` | Node.js projects |
+
 ## Development
 
 ```bash
+git clone https://github.com/kirankotari/ossguard-go.git
+cd ossguard-go
 go build -o ossguard ./cmd/ossguard
 go test ./...
 go vet ./...
@@ -88,4 +102,4 @@ go vet ./...
 
 ## License
 
-Apache-2.0
+Apache-2.0 — see [LICENSE](LICENSE) for details.
