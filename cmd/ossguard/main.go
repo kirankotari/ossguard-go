@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const version = "0.1.3"
+const version = "0.1.3-alpha.3"
 
 func main() {
 	root := &cobra.Command{
