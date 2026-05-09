@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.22'
       - run: go vet ./...
@@ -31,7 +31,7 @@ jobs:
             goarch: arm64
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: '1.22'
       - run: GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o ossguard-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/ossguard
