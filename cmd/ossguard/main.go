@@ -1,3 +1,10 @@
+// Command ossguard is the CLI entry point for OSSGuard.
+//
+// Usage:
+//
+//	ossguard <command> [path] [flags]
+//
+// Run "ossguard --help" for a full list of commands.
 package main
 
 import (
