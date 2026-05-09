@@ -1,0 +1,103 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions: read-all
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - run: go test -race ./...
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            artifact: ossguard-linux-amd64
+          - goos: linux
+            goarch: arm64
+            artifact: ossguard-linux-arm64
+          - goos: darwin
+            goarch: amd64
+            artifact: ossguard-macos-x64
+          - goos: darwin
+            goarch: arm64
+            artifact: ossguard-macos-arm64
+          - goos: windows
+            goarch: amd64
+            artifact: ossguard-windows-amd64.exe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Build
+        run: |
+          CGO_ENABLED=0 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} \
+            go build -ldflags="-s -w -X main.version=${{ github.ref_name }}" \
+            -o ${{ matrix.artifact }} ./cmd/ossguard
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate checksums
+        run: |
+          mkdir -p release
+          for dir in ossguard-*; do
+            cp "$dir"/* release/ 2>/dev/null || true
+          done
+          cd release
+          sha256sum * > checksums-sha256.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
+
+  sign:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: sigstore/cosign-installer@v3
+      - name: Download checksums
+        uses: actions/download-artifact@v4
+      - name: Sign
+        run: |
+          mkdir -p release
+          for dir in ossguard-*; do
+            cp "$dir"/* release/ 2>/dev/null || true
+          done
+          cd release
+          for f in ossguard-*; do
+            cosign sign-blob --yes --output-signature "$f.sig" --output-certificate "$f.pem" "$f"
+          done
+      - name: Upload signatures
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*.sig,release/*.pem
